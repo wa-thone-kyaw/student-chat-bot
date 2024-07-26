@@ -1,9 +1,8 @@
-// src/components/Navbar.js
+// src/components/Navbar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
-import { signOut } from "../firebase";
-import { auth } from "../firebase";
+import { auth, signOut } from "../firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const Navbar = ({ user, setUser }) => {
@@ -15,7 +14,7 @@ const Navbar = ({ user, setUser }) => {
         setUser(result.user);
       })
       .catch((error) => {
-        console.log("Error during sign-in:", error.message);
+        console.error("Error during sign-in:", error.message);
       });
   };
 
@@ -25,7 +24,7 @@ const Navbar = ({ user, setUser }) => {
         setUser(null);
       })
       .catch((error) => {
-        console.log("Error during sign-out:", error.message);
+        console.error("Error during sign-out:", error.message);
       });
   };
 

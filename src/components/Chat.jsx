@@ -4,6 +4,7 @@ import predefinedResponses from "../responses"; // Import the predefined respons
 const Chat = ({ user }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -26,19 +27,22 @@ const Chat = ({ user }) => {
         user: "user",
         avatar: user.photoURL || "https://via.placeholder.com/40", // User avatar
       };
-      setMessages([...messages, userMessage]);
+
+      const updatedMessages = [...messages, userMessage];
 
       // Determine bot's response
       const botReply = getBotReply(newMessage);
       if (botReply) {
-        setMessages([...messages, userMessage, botReply]);
+        setMessages([...updatedMessages, botReply]);
+      } else {
+        setMessages(updatedMessages);
       }
 
       setNewMessage("");
+      setSuggestions([]); // Clear suggestions after sending a message
     }
   };
 
-  // Function to get bot's response based on predefined phrases
   const getBotReply = (message) => {
     const lowerCaseMessage = message.toLowerCase();
     for (const [phrase, response] of Object.entries(predefinedResponses)) {
@@ -52,7 +56,6 @@ const Chat = ({ user }) => {
       }
     }
 
-    // Default response for unknown input
     return {
       id: messages.length + 2,
       text: "Sorry, I didn't understand that. Can you please rephrase?",
@@ -61,9 +64,29 @@ const Chat = ({ user }) => {
     };
   };
 
+  const handleInputChange = (e) => {
+    const input = e.target.value;
+    setNewMessage(input);
+
+    if (input.trim()) {
+      const lowerCaseInput = input.toLowerCase();
+      const matchingSuggestions = Object.keys(predefinedResponses).filter(
+        (phrase) => phrase.toLowerCase().includes(lowerCaseInput)
+      );
+      setSuggestions(matchingSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setNewMessage(suggestion);
+    setSuggestions([]);
+  };
+
   return (
-    <div className="container mx-auto p-4 h-screen flex flex-col">
-      <div className="flex-1 overflow-auto bg-gray-100 p-4 rounded-lg shadow-md">
+    <div className="container mx-auto p-4 h-screen flex flex-col bg-gray-50">
+      <div className="flex-1 overflow-auto bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col space-y-4">
           {messages.map((message) => (
             <div
@@ -72,7 +95,7 @@ const Chat = ({ user }) => {
                 message.user === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              <div className="flex items-start space-x-2">
+              <div className="flex items-start space-x-2 max-w-xs">
                 {message.user === "bot" && (
                   <img
                     src={message.avatar}
@@ -81,10 +104,10 @@ const Chat = ({ user }) => {
                   />
                 )}
                 <div
-                  className={`p-3 rounded-lg max-w-xs text-white ${
+                  className={`p-4 rounded-lg shadow-md ${
                     message.user === "user"
                       ? "bg-blue-500 text-white"
-                      : "bg-gray-300 text-gray-800"
+                      : "bg-gray-200 text-gray-800"
                   }`}
                 >
                   {message.text}
@@ -103,18 +126,34 @@ const Chat = ({ user }) => {
       </div>
       <form
         onSubmit={handleSendMessage}
-        className="flex mt-4 bg-gray-100 p-2 rounded-lg shadow-md"
+        className="flex mt-4 bg-white p-4 rounded-lg shadow-md relative"
       >
         <input
           type="text"
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={handleInputChange}
           placeholder="Type your message..."
-          className="flex-1 p-2 border border-gray-300 rounded-lg mr-2"
+          className="flex-1 p-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded-lg">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           Send
         </button>
+        {suggestions.length > 0 && (
+          <div className="absolute left-0 right-0 top-full bg-white border border-gray-300 rounded-lg shadow-md mt-1">
+            {suggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                className="p-2 cursor-pointer hover:bg-gray-200"
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                {suggestion}
+              </div>
+            ))}
+          </div>
+        )}
       </form>
     </div>
   );

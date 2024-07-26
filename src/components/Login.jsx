@@ -1,4 +1,4 @@
-// src/components/Login.js
+// src/components/Login.jsx
 import React from "react";
 import { auth, provider, signOut } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
@@ -11,7 +11,7 @@ const Login = ({ user, setUser }) => {
         setUser(result.user);
       })
       .catch((error) => {
-        console.log("Error during sign-in:", error.message);
+        console.error("Error during sign-in:", error.message);
       });
   };
 
@@ -21,7 +21,7 @@ const Login = ({ user, setUser }) => {
         setUser(null);
       })
       .catch((error) => {
-        console.log("Error during sign-out:", error.message);
+        console.error("Error during sign-out:", error.message);
       });
   };
 
