@@ -1,11 +1,21 @@
 import React from "react";
-import botImage1 from "../img/images1.jpg"; // Update the path
-import botImage2 from "../img/images2.png"; // Update the path
+import { useNavigate } from "react-router-dom";
+import botImage2 from "../img/images2.png"; // Adjust the path as necessary
 import "./About.css";
-const About = () => {
+
+const About = ({ user }) => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate("/chat");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="container mx-auto p-6">
-      {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-6xl font-bold mb-4">
           Revolutionize Students Service with Chatbot
@@ -15,12 +25,13 @@ const About = () => {
           chatbot robots provide 24/7 assistance and personalized service for
           your students.
         </p>
-        <button className="bg-blue-500 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-600 transition duration-300">
+        <button
+          onClick={handleGetStarted}
+          className="bg-blue-500 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-600 transition duration-300"
+        >
           Get Started
         </button>
       </div>
-
-      {/* Benefits Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <div className="flex flex-col items-center text-center">
           <h2 className="text-3xl font-semibold">Benefit</h2>
@@ -46,7 +57,6 @@ const About = () => {
           </p>
         </div>
       </div>
-
       <div className="text-center mt-6">
         <p className="text-lg mb-6">
           © 2024 Student Chat Bot. All rights reserved.

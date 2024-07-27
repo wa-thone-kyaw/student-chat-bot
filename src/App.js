@@ -8,7 +8,7 @@ import {
 import Navbar from "./components/Navbar";
 import About from "./pages/About";
 import Chat from "./components/Chat";
-import Home from "./components/Home";
+import Login from "./components/Login";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import "./AppUpdate.css";
@@ -27,12 +27,16 @@ const App = () => {
     <Router>
       <Navbar user={user} setUser={setUser} />
       <Routes>
-        <Route path="/about" element={<About />} />
+        <Route path="/about" element={<About user={user} />} />
         <Route
           path="/chat"
-          element={user ? <Chat user={user} /> : <Navigate to="/" />}
+          element={user ? <Chat user={user} /> : <Navigate to="/login" />}
         />
-        <Route path="/" element={<About />} />
+        <Route
+          path="/login"
+          element={<Login user={user} setUser={setUser} />}
+        />
+        <Route path="/" element={<About user={user} />} />
       </Routes>
     </Router>
   );

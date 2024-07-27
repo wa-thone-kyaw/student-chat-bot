@@ -1,11 +1,11 @@
-// src/components/Navbar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Router } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 import { auth, signOut } from "../firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import logo from "../img/images1.jpg"; // Adjust the path if necessary
 import "./Navbar.css";
+
 const Navbar = ({ user, setUser }) => {
   const provider = new GoogleAuthProvider();
 

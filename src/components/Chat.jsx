@@ -6,6 +6,8 @@ const Chat = ({ user }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [isTyping, setIsTyping] = useState(false); // State for typing effect
+  const [typingTimeout, setTypingTimeout] = useState(null); // Timeout for typing effect
 
   const messagesEndRef = useRef(null);
 
@@ -21,9 +23,10 @@ const Chat = ({ user }) => {
     }
   }, [user]);
 
-  // Scroll to the bottom of the chat whenever messages are updated
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleSendMessage = (e) => {
@@ -37,17 +40,26 @@ const Chat = ({ user }) => {
       };
 
       const updatedMessages = [...messages, userMessage];
-
-      // Determine bot's response
-      const botReply = getBotReply(newMessage);
-      if (botReply) {
-        setMessages([...updatedMessages, botReply]);
-      } else {
-        setMessages(updatedMessages);
-      }
-
+      setMessages(updatedMessages);
       setNewMessage("");
       setSuggestions([]); // Clear suggestions after sending a message
+
+      // Simulate bot typing
+      setIsTyping(true);
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+      const timeout = setTimeout(() => {
+        setIsTyping(false);
+        // Determine bot's response
+        const botReply = getBotReply(newMessage);
+        if (botReply) {
+          setMessages([...updatedMessages, botReply]);
+        } else {
+          setMessages(updatedMessages);
+        }
+      }, 1500); // Simulated typing delay in milliseconds
+      setTypingTimeout(timeout);
     }
   };
 
@@ -130,6 +142,20 @@ const Chat = ({ user }) => {
               </div>
             </div>
           ))}
+          {isTyping && (
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                  <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce animation-delay-200"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce animation-delay-400"></div>
+                </div>
+                <div className="flex-1 p-2 rounded-lg bg-gray-200 text-gray-800">
+                  Typing...
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>
