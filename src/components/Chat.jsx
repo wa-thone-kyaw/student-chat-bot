@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import predefinedResponses from "../responses"; // Import the predefined responses
+import botLogo from "../img/images1.jpg"; // Adjust the path if necessary
 
 const Chat = ({ user }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -12,11 +15,16 @@ const Chat = ({ user }) => {
         id: 1,
         text: `Welcome, ${user.displayName}! How can I assist you today?`,
         user: "bot",
-        avatar: "https://via.placeholder.com/40", // Bot avatar
+        avatar: botLogo, // Use the bot logo
       };
       setMessages([welcomeMessage]);
     }
   }, [user]);
+
+  // Scroll to the bottom of the chat whenever messages are updated
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -46,12 +54,12 @@ const Chat = ({ user }) => {
   const getBotReply = (message) => {
     const lowerCaseMessage = message.toLowerCase();
     for (const [phrase, response] of Object.entries(predefinedResponses)) {
-      if (lowerCaseMessage.includes(phrase)) {
+      if (lowerCaseMessage.includes(phrase.toLowerCase())) {
         return {
           id: messages.length + 2,
           text: response,
           user: "bot",
-          avatar: "https://via.placeholder.com/40", // Bot avatar
+          avatar: botLogo, // Use the bot logo
         };
       }
     }
@@ -60,7 +68,7 @@ const Chat = ({ user }) => {
       id: messages.length + 2,
       text: "Sorry, I didn't understand that. Can you please rephrase?",
       user: "bot",
-      avatar: "https://via.placeholder.com/40", // Bot avatar
+      avatar: botLogo, // Use the bot logo
     };
   };
 
@@ -70,9 +78,9 @@ const Chat = ({ user }) => {
 
     if (input.trim()) {
       const lowerCaseInput = input.toLowerCase();
-      const matchingSuggestions = Object.keys(predefinedResponses).filter(
-        (phrase) => phrase.toLowerCase().includes(lowerCaseInput)
-      );
+      const matchingSuggestions = Object.entries(predefinedResponses)
+        .filter(([phrase]) => phrase.toLowerCase().includes(lowerCaseInput))
+        .map(([phrase, response]) => ({ phrase, response }));
       setSuggestions(matchingSuggestions);
     } else {
       setSuggestions([]);
@@ -80,12 +88,12 @@ const Chat = ({ user }) => {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setNewMessage(suggestion);
+    setNewMessage(suggestion.phrase);
     setSuggestions([]);
   };
 
   return (
-    <div className="container mx-auto p-4 h-screen flex flex-col bg-gray-50">
+    <div className="container mx-auto p-4 h-screen flex flex-col bg-gray-50 relative">
       <div className="flex-1 overflow-auto bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col space-y-4">
           {messages.map((message) => (
@@ -122,6 +130,7 @@ const Chat = ({ user }) => {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       </div>
       <form
@@ -141,20 +150,20 @@ const Chat = ({ user }) => {
         >
           Send
         </button>
-        {suggestions.length > 0 && (
-          <div className="absolute left-0 right-0 top-full bg-white border border-gray-300 rounded-lg shadow-md mt-1">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                className="p-2 cursor-pointer hover:bg-gray-200"
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                {suggestion}
-              </div>
-            ))}
-          </div>
-        )}
       </form>
+      {suggestions.length > 0 && (
+        <div className="absolute bottom-16 left-0 right-0 mt-1 z-10 p-2 flex flex-wrap bg-transparent">
+          {suggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              className="p-2 m-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              {suggestion.phrase}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 import { auth, signOut } from "../firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-
+import logo from "../img/images1.jpg"; // Adjust the path if necessary
+import "./Navbar.css";
 const Navbar = ({ user, setUser }) => {
   const provider = new GoogleAuthProvider();
 
@@ -30,9 +31,12 @@ const Navbar = ({ user, setUser }) => {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      <Link to="/" className="text-xl">
-        Student Chat Bot
-      </Link>
+      <div className="flex items-center">
+        <img src={logo} alt="Logo" className="h-10 w-10 mr-2" />
+        <Link to="/" className="text-xl">
+          Student Chat Bot
+        </Link>
+      </div>
       <div className="flex items-center space-x-4">
         <Link to="/about" className="hover:underline">
           About Us
